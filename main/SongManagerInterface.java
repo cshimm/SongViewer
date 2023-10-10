@@ -1,3 +1,5 @@
+package main;
+
 public interface SongManagerInterface {
 
     // SongManager should have one constructor, an empty one (no parameters)

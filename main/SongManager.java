@@ -16,13 +16,13 @@ public final class SongManager implements SongManagerInterface {
         CSVReader csvReader = new CSVReader(new FileReader(countByReleaseYear));
 
         int yearCount = Integer.parseInt(csvReader.readNext()[0]);
-        songArray = new Object[yearCount][];
+        songArray = new Song[yearCount][];
         csvReader.skip(1);
 
         for (int i = 0; i < yearCount; i++) {
             var line = csvReader.readNext();
             if (line.length < 2) continue;
-            songArray[i] = new Object[Integer.parseInt(line[1])];
+            songArray[i] = new Song[Integer.parseInt(line[1])];
         }
 
         String pathToSpotifyStreamData = "C:\\Users\\camer\\Documents\\NSC AD\\FALL23\\SongViewer\\data\\spotify-2023.csv";

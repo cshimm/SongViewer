@@ -1,4 +1,4 @@
-package main;
+package src;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
@@ -6,9 +6,14 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
+/**
+ * @author cameron shimmin
+ *
+ */
 public final class SongManager implements SongManagerInterface {
-    private final Object[][] songArray;
+    private final Song[][] songsByYears;
 
     public SongManager() throws IOException, CsvValidationException {
         String pathToCountByReleaseYear = "C:\\Users\\camer\\Documents\\NSC AD\\FALL23\\SongViewer\\data\\count-by-release-year.csv";
@@ -16,13 +21,13 @@ public final class SongManager implements SongManagerInterface {
         CSVReader csvReader = new CSVReader(new FileReader(countByReleaseYear));
 
         int yearCount = Integer.parseInt(csvReader.readNext()[0]);
-        songArray = new Song[yearCount][];
+        songsByYears = new Song[yearCount][];
         csvReader.skip(1);
 
         for (int i = 0; i < yearCount; i++) {
             var line = csvReader.readNext();
             if (line.length < 2) continue;
-            songArray[i] = new Song[Integer.parseInt(line[1])];
+            songsByYears[i] = new Song[Integer.parseInt(line[1])];
         }
 
         String pathToSpotifyStreamData = "C:\\Users\\camer\\Documents\\NSC AD\\FALL23\\SongViewer\\data\\spotify-2023.csv";
@@ -50,25 +55,28 @@ public final class SongManager implements SongManagerInterface {
                 yearIndex++;
                 songIndex = 0;
             }
-            songArray[yearIndex][songIndex] = song;
+            songsByYears[yearIndex][songIndex] = song;
             songIndex++;
+        }
+        for (var songArr : songsByYears) {
+            Arrays.sort(songArr);
         }
     }
 
     @Override
     public int getYearCount() {
-        return songArray.length;
+        return songsByYears.length;
     }
 
     @Override
     public int getSongCount(int yearIndex) {
-        return songArray[yearIndex].length;
+        return songsByYears[yearIndex].length;
     }
 
     @Override
     public int getSongCount() {
         int total = 0;
-        for (var year : songArray) {
+        for (var year : songsByYears) {
             total += year.length;
         }
         return total;
@@ -76,14 +84,14 @@ public final class SongManager implements SongManagerInterface {
 
     @Override
     public String getYearName(int yearIndex) {
-        Song song = (Song) songArray[yearIndex][0];
+        Song song = songsByYears[yearIndex][0];
         return song.releasedYear();
     }
 
     @Override
     public int getSongCount(String year) {
-        for (Object[] y : songArray) {
-            Song song = (Song) y[0];
+        for (Song[] y : songsByYears) {
+            Song song = y[0];
             if (song.releasedYear().equals(year)) {
                 return y.length;
             }
@@ -93,23 +101,21 @@ public final class SongManager implements SongManagerInterface {
 
     @Override
     public Song getSong(int yearIndex, int songIndex) {
-        return (Song) songArray[yearIndex][songIndex];
+        return songsByYears[yearIndex][songIndex];
     }
 
     @Override
     public Song[] getSongs(int yearIndex) {
-        Song[] songs = new Song[songArray[yearIndex].length];
-        for (int i = 0; i < songs.length; i++) {
-            songs[i] = (Song) songArray[yearIndex][i];
-        }
+        Song[] songs = new Song[songsByYears[yearIndex].length];
+        System.arraycopy(songsByYears[yearIndex], 0, songs, 0, songs.length);
         return songs;
     }
 
     @Override
     public int findSongYear(String trackName) {
-        for (int i = 0; i < songArray.length; i++) {
-            for (int j = 0; j < songArray[i].length; j++) {
-                Song song = (Song) songArray[i][j];
+        for (int i = 0; i < songsByYears.length; i++) {
+            for (int j = 0; j < songsByYears[i].length; j++) {
+                Song song = songsByYears[i][j];
                 if (song.trackName().equals(trackName)) {
                     return i;
                 }

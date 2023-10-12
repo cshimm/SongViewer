@@ -1,4 +1,4 @@
-package main;
+package src;
 
 import java.util.Objects;
 
@@ -9,8 +9,8 @@ public record Song(
         String releasedMonth,
         String releasedDay,
         String totalNumberOfStreamsOnSpotify
-) {
-    public Song {
+) implements Comparable<Song> {
+    public Song  {
         Objects.requireNonNull(trackName, "Track name must not be null");
         Objects.requireNonNull(artistName, "Artist name must not be null");
         Objects.requireNonNull(releasedYear, "Released year must not be null");
@@ -23,4 +23,8 @@ public record Song(
         return song.equals(this);
     }
 
+    @Override
+    public int compareTo(Song other) {
+        return this.trackName.compareTo(other.trackName);
+    }
 }

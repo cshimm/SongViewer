@@ -2,6 +2,15 @@ package src;
 
 import java.util.Objects;
 
+/**
+ * @author cameron shimmin
+ * @param trackName name of the song
+ * @param artistName the song's artist
+ * @param releasedYear the year the song was released
+ * @param releasedMonth the month the song was released
+ * @param releasedDay the day the song was released
+ * @param totalNumberOfStreamsOnSpotify total number of streams on spotify
+ */
 public record Song(
         String trackName,
         String artistName,
@@ -19,12 +28,8 @@ public record Song(
         Objects.requireNonNull(totalNumberOfStreamsOnSpotify, "Total number of streams must not be null");
     }
 
-    boolean equals(Song song) {
-        return song.equals(this);
-    }
-
     @Override
     public int compareTo(Song other) {
-        return this.trackName.compareTo(other.trackName);
+        return trackName.compareTo(other.trackName);
     }
 }

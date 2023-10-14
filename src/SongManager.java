@@ -10,7 +10,14 @@ import java.util.Arrays;
 
 /**
  * @author cameron shimmin
- *
+ * <br>
+ * @description The SongManager reads data from 2 files count-by-release-year.csv and
+ * spotify-2023.csv and organizes the songs by year in sub-arrays. These
+ * arrays are placed in a parent array 'songsByYears' and are organized
+ * in chronological order.
+ * <br>
+ * The SongManager implements the SongManagerInterface which allows for
+ * querying of the songsByYears array.
  */
 public final class SongManager implements SongManagerInterface {
     private final Song[][] songsByYears;
@@ -26,8 +33,8 @@ public final class SongManager implements SongManagerInterface {
 
         for (int i = 0; i < yearCount; i++) {
             var line = csvReader.readNext();
-            if (line.length < 2) continue;
-            songsByYears[i] = new Song[Integer.parseInt(line[1])];
+            if (line.length == 2)
+                songsByYears[i] = new Song[Integer.parseInt(line[1])];
         }
 
         String pathToSpotifyStreamData = "C:\\Users\\camer\\Documents\\NSC AD\\FALL23\\SongViewer\\data\\spotify-2023.csv";
@@ -41,7 +48,6 @@ public final class SongManager implements SongManagerInterface {
         int yearIndex = -1;
         int songIndex = 0;
         while ((line = csvReader.readNext()) != null) {
-            // Create a Song object with the extracted data
             song = new Song(
                     line[0], // Track name
                     line[1], // Artist name
@@ -84,15 +90,14 @@ public final class SongManager implements SongManagerInterface {
 
     @Override
     public String getYearName(int yearIndex) {
-        Song song = songsByYears[yearIndex][0];
-        return song.releasedYear();
+        return songsByYears[yearIndex][0].releasedYear();
     }
 
     @Override
     public int getSongCount(String year) {
         for (Song[] y : songsByYears) {
-            Song song = y[0];
-            if (song.releasedYear().equals(year)) {
+            String releaseYear = y[0].releasedYear();
+            if (releaseYear.equals(year)) {
                 return y.length;
             }
         }
@@ -107,7 +112,13 @@ public final class SongManager implements SongManagerInterface {
     @Override
     public Song[] getSongs(int yearIndex) {
         Song[] songs = new Song[songsByYears[yearIndex].length];
-        System.arraycopy(songsByYears[yearIndex], 0, songs, 0, songs.length);
+        System.arraycopy(
+                songsByYears[yearIndex],
+                0,
+                songs,
+                0,
+                songs.length
+        );
         return songs;
     }
 
@@ -115,8 +126,8 @@ public final class SongManager implements SongManagerInterface {
     public int findSongYear(String trackName) {
         for (int i = 0; i < songsByYears.length; i++) {
             for (int j = 0; j < songsByYears[i].length; j++) {
-                Song song = songsByYears[i][j];
-                if (song.trackName().equals(trackName)) {
+                String track = songsByYears[i][j].trackName();
+                if (track.equals(trackName)) {
                     return i;
                 }
             }

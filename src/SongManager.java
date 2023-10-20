@@ -23,7 +23,7 @@ public final class SongManager implements SongManagerInterface {
     private final Song[][] songsByYears;
 
     public SongManager() throws IOException, CsvValidationException {
-        String pathToCountByReleaseYear = "C:\\Users\\camer\\Documents\\NSC AD\\FALL23\\SongViewer\\data\\count-by-release-year.csv";
+        String pathToCountByReleaseYear = "data/count-by-release-year.csv";
         File countByReleaseYear = new File(pathToCountByReleaseYear);
         CSVReader csvReader = new CSVReader(new FileReader(countByReleaseYear));
 
@@ -37,7 +37,7 @@ public final class SongManager implements SongManagerInterface {
                 songsByYears[i] = new Song[Integer.parseInt(line[1])];
         }
 
-        String pathToSpotifyStreamData = "C:\\Users\\camer\\Documents\\NSC AD\\FALL23\\SongViewer\\data\\spotify-2023.csv";
+        String pathToSpotifyStreamData = "data/spotify-2023.csv";
         File spotifyStreamData = new File(pathToSpotifyStreamData);
         csvReader = new CSVReader(new FileReader(spotifyStreamData));
         csvReader.skip(1);

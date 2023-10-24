@@ -21,6 +21,7 @@ import java.util.Arrays;
  */
 public final class SongManager implements SongManagerInterface {
     private final Song[][] songsByYears;
+    private final String[] years;
 
     public SongManager() throws IOException, CsvValidationException {
         String pathToCountByReleaseYear = "data/count-by-release-year.csv";
@@ -28,6 +29,7 @@ public final class SongManager implements SongManagerInterface {
         CSVReader csvReader = new CSVReader(new FileReader(countByReleaseYear));
 
         int yearCount = Integer.parseInt(csvReader.readNext()[0]);
+        years = new String[yearCount];
         songsByYears = new Song[yearCount][];
         csvReader.skip(1);
 
@@ -60,6 +62,7 @@ public final class SongManager implements SongManagerInterface {
                 currYear = song.releasedYear();
                 yearIndex++;
                 songIndex = 0;
+                years[yearIndex] = currYear;
             }
             songsByYears[yearIndex][songIndex] = song;
             songIndex++;
@@ -69,9 +72,13 @@ public final class SongManager implements SongManagerInterface {
         }
     }
 
+    public String[] getYears() {
+        return years;
+    }
+
     @Override
     public int getYearCount() {
-        return songsByYears.length;
+        return years.length;
     }
 
     @Override
@@ -90,7 +97,7 @@ public final class SongManager implements SongManagerInterface {
 
     @Override
     public String getYearName(int yearIndex) {
-        return songsByYears[yearIndex][0].releasedYear();
+        return years[yearIndex];
     }
 
     @Override

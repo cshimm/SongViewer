@@ -45,9 +45,11 @@ public final class SongManager implements SongManagerInterface {
         csvReader.skip(1); //Skip line 2
 
         /*
-        Loop through lines in CSV file. if the array returned from the line has a length of 2 then it is valid
+        Loop through lines in count-by-release-year file.
+        if the array returned from the line has a length of 2 then it is valid
         and the 2nd element in the array can be used to create a new Song array and initialize its size.
-        The subsequent song array is assigned to the songsByYears array at a different index position.
+        The subsequent song array is assigned to the songsByYears array at an index position that
+        corresponds with the current year index (i).
         */
         for (int i = 0; i < yearCount; i++) {
             var line = csvReader.readNext();

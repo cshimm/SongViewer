@@ -101,13 +101,13 @@ public class SongViewer extends JFrame {
         }
 
         /**
-         * Updates the details label to display information about the current song index and the total number of songs.
-         *
+         * Updates the details label to display information about the current song index and the total number of songs
+         * as well as the proportion of current song to total songs for that year.
          * @param currSongIndex The current song index (zero-based).
          */
         public void setDetailsLabel(int currSongIndex) {
             DecimalFormat df = new DecimalFormat("#.##");
-            int currSongNumber = currSongIndex + 1;
+            int currSongNumber = currSongIndex + 1; // add one to handle 0-index
             String formatted = df.format((currSongNumber / (double) sm.getSongCount(yearIndex)) * 100);
             detailsLabel.setText("    " + formatted + "% | " + currSongNumber + " of " +
                     sm.getSongCount(yearIndex) + " total songs");
@@ -226,19 +226,33 @@ public class SongViewer extends JFrame {
         DataContainer dataContainer = new DataContainer();
         SongDetailsContainer songDetailsContainer = new SongDetailsContainer();
 
-        // Listener for when new year is selected
+        /*
+        Listener for year dropdown:
+        Get the selected year index and check if that year has multiple songs (more than one). If true set both buttons
+        to active, if year only has 1 song, set both inactive.
+         */
         dataContainer.yearDropdown.addActionListener(e -> {
             yearIndex = dataContainer.yearDropdown.getSelectedIndex();
-            songIndex = 0;
             boolean hasMultipleSongsInYear = sm.getSongCount(yearIndex) > 1;
             dataContainer.buttons[1].setEnabled(hasMultipleSongsInYear);
             dataContainer.buttons[2].setEnabled(hasMultipleSongsInYear);
 
+            /*
+            Reset song index to the first song in the array for that year.
+            Update detail label with appropriate data.
+            Update song details container with song data.
+             */
+            songIndex = 0;
             dataContainer.setDetailsLabel(songIndex);
             songDetailsContainer.setData();
         });
         //Load button
         dataContainer.buttons[0].addActionListener(e -> {
+            /*
+            When Load button is clicked, create a new SongManager object.
+            Then set the data container and song details containers' data.
+            Disable the load button to indicate data has been successfully loaded.
+             */
             try {
                 sm = new SongManager();
                 dataContainer.setData();
@@ -248,12 +262,20 @@ public class SongViewer extends JFrame {
                 throw new RuntimeException(err);
             }
         });
-        // Prev btn
+        /*
+        Prev button:
+        subscribe to the Data Containers HandlePrevBtnClicked method: This method handles the logic for displaying
+        information about the previous song. Then update the song details container.
+         */
         dataContainer.buttons[1].addActionListener(e -> {
             dataContainer.handlePrevBtnClicked();
             songDetailsContainer.setData();
         });
-        // next btn
+        /*
+        Next button:
+        subscribe to the Data Containers HandleNextBtnClicked method: This method handles the logic for displaying
+        information about the next song. Then update the song details container.
+         */
         dataContainer.buttons[2].addActionListener(e -> {
             dataContainer.handleNextBtnClicked();
             songDetailsContainer.setData();

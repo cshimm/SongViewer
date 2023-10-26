@@ -17,6 +17,7 @@ public record Song(
         String releasedYear,
         String releasedMonth,
         String releasedDay,
+        String totalPlaylists,
         String totalNumberOfStreamsOnSpotify
 ) implements Comparable<Song> {
     public Song  {
@@ -25,6 +26,7 @@ public record Song(
         Objects.requireNonNull(releasedYear, "Released year must not be null");
         Objects.requireNonNull(releasedMonth, "Released month must not be null");
         Objects.requireNonNull(releasedDay, "Released day must not be null");
+        Objects.requireNonNull(totalPlaylists, "Total playlists must not be null");
         Objects.requireNonNull(totalNumberOfStreamsOnSpotify, "Total number of streams must not be null");
     }
 

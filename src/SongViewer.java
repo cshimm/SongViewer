@@ -8,25 +8,44 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
-
+/**
+ * @author Cameron Shimmin
+ * SongViewer represents a graphical user interface for viewing and interacting with song data.
+ * It extends the JFrame class and provides a user interface to interact with a SongManager
+ * instance. This class maintains static references to the SongManager, the current year index, and the current
+ * song index for managing the displayed data.
+ */
 public class SongViewer extends JFrame {
-    static final int WIDTH = 400;
-    static final int HEIGHT = 250;
-    static SongManager sm;
-    static int yearIndex;
-    static int songIndex;
+    // The song manager the SongViewer with interface with
+    private static SongManager sm;
+    // Indexes for the year and song
+    private static int yearIndex;
+    private static int songIndex;
 
-    public SongViewer(String title) {
+    /**
+     * Constructs a new SongViewer with the specified title, width, and height.
+     *
+     * @param title   the title to set for the SongViewer window.
+     * @param width   the width of the SongViewer window.
+     * @param height  the height of the SongViewer window.
+     */
+    public SongViewer(String title, int width, int height) {
         setTitle(title);
-        setSize(WIDTH, HEIGHT);
+        setSize(width, height);
         setLayout(new GridLayout(1, 1));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /**
+     * DataContainer is a JPanel that serves as a container for various UI components.
+     * It includes three buttons (Load Data, Prev, Next), a year dropdown (JComboBox),
+     * and a details label (JLabel). These components are laid out using a GridBagLayout
+     * to create a structured user interface for interacting with data.
+     */
     public static class DataContainer extends JPanel {
-        JButton[] buttons;
-        JLabel detailsLabel;
-        JComboBox<String> yearDropdown;
+        private final JButton[] buttons;
+        private final JLabel detailsLabel;
+        private final JComboBox<String> yearDropdown;
 
         JButton DrawButton(String label) {
             JButton button = new JButton(label);
@@ -34,6 +53,11 @@ public class SongViewer extends JFrame {
             return button;
         }
 
+        /**
+         * Constructs the Data container with 3 Buttons and sets positions:
+         * Load Data, Prev, Next.
+         * Constructs the year Dropdown and browse details label and sets positions.
+         */
         public DataContainer() {
             GridBagLayout gridLayout = new GridBagLayout();
             setLayout(gridLayout);
@@ -64,53 +88,85 @@ public class SongViewer extends JFrame {
             add(detailsLabel, gbc);
         }
 
+        /**
+         * Populates the year dropdown with available years from the SongManager and sets the initial yearIndex.
+         * Additionally, it sets the details label with song information for the first year.
+         */
         public void setData() {
             for (var year : sm.getYears()) {
                 yearDropdown.addItem(year);
             }
             yearIndex = 0;
-            setDetailsLabel(songIndex, sm.getSongCount(yearIndex));
+            setDetailsLabel(songIndex);
         }
 
-        public void setDetailsLabel(int currSongIndex, int totalSongs) {
+        /**
+         * Updates the details label to display information about the current song index and the total number of songs.
+         *
+         * @param currSongIndex The current song index (zero-based).
+         */
+        public void setDetailsLabel(int currSongIndex) {
             DecimalFormat df = new DecimalFormat("#.##");
             int currSongNumber = currSongIndex + 1;
-            String formatted = df.format((currSongNumber / (double) totalSongs) * 100);
+            String formatted = df.format((currSongNumber / (double) sm.getSongCount(yearIndex)) * 100);
             detailsLabel.setText("    " + formatted + "% | " + currSongNumber + " of " +
                     sm.getSongCount(yearIndex) + " total songs");
         }
 
+        /**
+         * Callback for when Prev button is clicked.
+         */
         public void handlePrevBtnClicked() {
+            // If the current song is the first song, then set the index to be the last song.
             if (songIndex <= 0)
+                // I set it to the length because the next line will bring it to song count - 1
                 songIndex = sm.getSongCount(yearIndex);
             songIndex--;
-            setDetailsLabel(songIndex, sm.getSongCount(yearIndex));
+            setDetailsLabel(songIndex);
         }
-
+        /**
+         * Callback for when Next button is clicked.
+         * Increment the song Index and set the details label
+         */
         public void handleNextBtnClicked() {
+            // If the current song is the last song, the set the index to be the first song.
             if (songIndex >= sm.getSongCount(yearIndex) - 1)
+                // I set it to -1 because the next line will bring it up to 0
                 songIndex = -1;
             songIndex++;
-            setDetailsLabel(songIndex, sm.getSongCount(yearIndex));
+            setDetailsLabel(songIndex);
         }
     }
-
+    /**
+     * SongDetailsContainer is a JPanel that serves as a container for song details, including track name,
+     * artist, release date, and total streams. It contains instances of the SongDetail class for each
+     * of these details.
+     */
     public static class SongDetailsContainer extends JPanel {
-        SongDetail trackName;
-        SongDetail artist;
-        SongDetail releaseDate;
-        SongDetail totalStreams;
-
+        private final SongDetail trackName;
+        private final SongDetail artist;
+        private final SongDetail releaseDate;
+        private final SongDetail totalStreams;
+        private final SongDetail totalPlaylists;
+        /**
+         * Constructs a SongDetailsContainer, a JPanel that organizes song details using a GridLayout.
+         * It includes SongDetail components for track name, artist(s), release date, and total streams.
+         * These details are displayed in pairs within the container.
+         */
         public SongDetailsContainer() {
-            GridLayout gridLayout = new GridLayout(4, 2);
+            GridLayout gridLayout = new GridLayout(5, 2);
             setLayout(gridLayout);
 
             add(trackName = new SongDetail("Track Name: "));
             add(artist = new SongDetail("Artist(s): "));
             add(releaseDate = new SongDetail("Release Date: "));
             add(totalStreams = new SongDetail("Total Streams: "));
+            add(totalPlaylists = new SongDetail("Total Playlists: "));
         }
 
+        /**
+         * Set the text-fields with the corresponding Song data
+         */
         public void setData() {
             Song currentSong = sm.getSong(yearIndex, songIndex);
             trackName.setTextField(currentSong.trackName());
@@ -120,6 +176,7 @@ public class SongViewer extends JFrame {
             releaseDate.setTextField(formattedReleaseDate);
 
             NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+            // Handle error if total streams can't be parsed int
             try {
                 String formattedStreams = nf.format(
                         Double.parseDouble(currentSong.totalNumberOfStreamsOnSpotify()));
@@ -127,11 +184,20 @@ public class SongViewer extends JFrame {
             } catch (NumberFormatException e) {
                 totalStreams.setTextField("Error: Bad data");
             }
+            totalPlaylists.setTextField(currentSong.totalPlaylists());
         }
 
+        /**
+         * Inner class: A panel that holds a label and text-field.
+         * The text field can be set manually.
+         */
         public static class SongDetail extends JPanel {
-            JTextField textField;
-
+            private final JTextField textField;
+            /**
+             * Constructs a SongDetail component that consists of a label and a text field.
+             *
+             * @param label The label to display for the component.
+             */
             public SongDetail(String label) {
                 setLayout(new GridBagLayout());
                 GridBagConstraints textFieldConstraints = new GridBagConstraints();
@@ -139,10 +205,14 @@ public class SongViewer extends JFrame {
                 textFieldConstraints.weightx = 1.0;
                 textFieldConstraints.anchor = GridBagConstraints.EAST;
                 textField = new JTextField();
-                textField.setPreferredSize(new Dimension(250, 30));
+                textField.setPreferredSize(new Dimension(300, 30));
                 add(textField, textFieldConstraints);
             }
 
+            /**
+             * Set the text field's text value
+             * @param text The text value to set the text field to
+             */
             void setTextField(String text) {
                 textField.setText(text);
             }
@@ -151,7 +221,7 @@ public class SongViewer extends JFrame {
 
     public static void main(String[] args) {
         // Construct the UI
-        SongViewer songViewer = new SongViewer("Song Viewer");
+        SongViewer songViewer = new SongViewer("Song Viewer", 425, 275);
         JPanel container = new JPanel();
         DataContainer dataContainer = new DataContainer();
         SongDetailsContainer songDetailsContainer = new SongDetailsContainer();
@@ -164,7 +234,7 @@ public class SongViewer extends JFrame {
             dataContainer.buttons[1].setEnabled(hasMultipleSongsInYear);
             dataContainer.buttons[2].setEnabled(hasMultipleSongsInYear);
 
-            dataContainer.setDetailsLabel(songIndex, sm.getSongCount(yearIndex));
+            dataContainer.setDetailsLabel(songIndex);
             songDetailsContainer.setData();
         });
         //Load button

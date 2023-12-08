@@ -25,13 +25,12 @@ public final class SongManager implements SongManagerInterface {
     // An array of every year.
     private final String[] years;
 
-    public SongManager() throws IOException, CsvValidationException {
+    public SongManager(String yearData, String spotifyData) throws IOException, CsvValidationException {
         /*
         Create File with count-by-release-year.csv
         Then construct CSVReader with that File
         */
-        String pathToCountByReleaseYear = "data/count-by-release-year.csv";
-        File countByReleaseYear = new File(pathToCountByReleaseYear);
+        File countByReleaseYear = new File(yearData);
         CSVReader csvReader = new CSVReader(new FileReader(countByReleaseYear));
 
         /*
@@ -61,8 +60,7 @@ public final class SongManager implements SongManagerInterface {
         Create File with spotify-2023.csv
         Reinitialize csvReader with new File
          */
-        String pathToSpotifyStreamData = "data/spotify-2023.csv";
-        File spotifyStreamData = new File(pathToSpotifyStreamData);
+        File spotifyStreamData = new File(spotifyData);
         csvReader = new CSVReader(new FileReader(spotifyStreamData));
         csvReader.skip(1); // Skip line 2
 

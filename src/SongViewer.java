@@ -254,7 +254,7 @@ public class SongViewer extends JFrame {
             Disable the load button to indicate data has been successfully loaded.
              */
             try {
-                sm = new SongManager();
+                sm = new SongManager("data/count-by-release-year.csv", "data/spotify-2023.csv");
                 dataContainer.setData();
                 songDetailsContainer.setData();
                 dataContainer.buttons[0].setEnabled(false);
